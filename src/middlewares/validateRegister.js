@@ -14,7 +14,7 @@ const userSchema = Yup.object().shape({
   passwordHash: Yup.string().required(),
 });
 
-const validateData = async (req, res, next) => {
+const validateRegister = async (req, res, next) => {
   try {
     await userSchema.validate(req.body, { abortEarly: false });
     next();
@@ -29,4 +29,4 @@ const validateData = async (req, res, next) => {
   }
 };
 
-module.exports = validateData;
+module.exports = validateRegister;

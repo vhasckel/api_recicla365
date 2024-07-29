@@ -1,9 +1,9 @@
 const { Router } = require("express");
 const UserController = require("../controllers/UserController");
-const validateData = require("../middlewares/validateData");
+const validateRegister = require("../middlewares/validateRegister");
 
 const usersRoutes = new Router();
 
-usersRoutes.post("/cadastrar", validateData, UserController.createAccount);
+usersRoutes.post("/cadastrar", validateRegister, UserController.createAccount);
 
 module.exports = usersRoutes;
