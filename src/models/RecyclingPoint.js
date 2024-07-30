@@ -1,7 +1,7 @@
 const { DataTypes } = require("sequelize");
 const connection = require("../database/connection");
 
-const RecyclingPoints = connection.define("users", {
+const RecyclingPoint = connection.define("recycling_points", {
   name: {
     type: DataTypes.STRING(100),
     allowNull: false,
@@ -40,4 +40,4 @@ const RecyclingPoints = connection.define("users", {
   },
 });
 
-module.exports = RecyclingPoints;
+module.exports = RecyclingPoint;
