@@ -1,6 +1,9 @@
 const MaterialCollectionPoint = require("../models/MaterialCollectionPoint");
 const RecyclingPoint = require("../models/RecyclingPoint");
 const Material = require("../models/Material");
+const {
+  createCollectPointSchema,
+} = require("../middlewares/validationSchemas");
 
 //feito a associação muitos-para-muitos RecyclingPoint e Material usando a tabela de junção MaterialCollectionPoint
 // - um ponto de coleta pode ter muitos tipos de materiais e um material pode ser aceito em muitos pontos de coleta;
@@ -16,6 +19,11 @@ Material.belongsToMany(RecyclingPoint, {
 class RecyclingPointController {
   async createCollectPoint(request, response) {
     try {
+      const validatedData = await createCollectPointSchema.validate(
+        request.body,
+        { abortEarly: false }
+      );
+
       const {
         name,
         description,
@@ -26,7 +34,7 @@ class RecyclingPointController {
         latitude,
         userId,
         materials,
-      } = request.body;
+      } = validatedData;
 
       if (!Array.isArray(materials)) {
         return response
