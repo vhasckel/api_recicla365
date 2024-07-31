@@ -36,12 +36,6 @@ class RecyclingPointController {
         materials,
       } = validatedData;
 
-      if (!Array.isArray(materials)) {
-        return response
-          .status(400)
-          .json({ message: "Materials precisa ser um Array de IDs" });
-      }
-
       const recyclingPoint = await RecyclingPoint.create({
         name,
         description,
@@ -82,6 +76,146 @@ class RecyclingPointController {
       console.error(error);
       return response.status(500).json({
         message: "Erro ao criar ponto de coleta",
+        error: error.message,
+      });
+    }
+  }
+
+  async getAllRecyclingPoints(request, response) {
+    try {
+      const points = await RecyclingPoint.findAll({
+        attributes: ["id", "name"],
+      });
+
+      if (points.length === 0) {
+        response
+          .status(404)
+          .json({ message: "Não foi encontrado nenhum ponto de coleta" });
+      }
+      return response.status(200).json(points);
+    } catch (error) {
+      console.error(error);
+      return response.status(500).json({
+        message: "Erro ao buscar pontos de coleta",
+        error: error.message,
+      });
+    }
+  }
+
+  async getOneRecyclingPoint(request, response) {
+    try {
+      const id = request.params.id;
+      //se quiser que apareça os materiais junto com essa requisição, é preciso incluir o model de Material
+      const point = await RecyclingPoint.findByPk(id, {
+        include: [
+          {
+            model: Material,
+            through: {
+              attributes: [],
+            },
+          },
+        ],
+      });
+
+      if (!point) {
+        response
+          .status(404)
+          .json({ message: "Ponto de coleta não encontrado" });
+      }
+
+      return response.status(200).json(point);
+    } catch (error) {
+      console.error(error);
+      return response.status(500).json({
+        message: "Erro ao buscar ponto de coleta",
+        error: error.message,
+      });
+    }
+  }
+
+  async updateRecyclingPoint(request, response) {
+    try {
+      const id = request.params.id;
+      const validatedData = await createCollectPointSchema.validate(
+        request.body,
+        { abortEarly: false }
+      );
+
+      const point = await RecyclingPoint.findByPk(id);
+
+      if (!point) {
+        response
+          .status(404)
+          .json({ message: "Ponto de coleta não encontrado" });
+      }
+      point.name = validatedData.name;
+      point.description = validatedData.description;
+      point.cep = validatedData.cep;
+      point.neighbourhood = validatedData.neighbourhood;
+      point.street = validatedData.street;
+      point.longitude = validatedData.latitude;
+      point.latitude = validatedData.latitude;
+      point.materials = validatedData.materials;
+      await point.save();
+
+      //para poder atualizar os tipos de materiais, precisamos primeiro limpar os dados que estavam salvos
+      if (Array.isArray(validatedData.materials)) {
+        await MaterialCollectionPoint.destroy({
+          where: { collectPointId: id },
+        });
+
+        const materialAssociations = validatedData.materials.map(
+          (materialId) => ({
+            collectPointId: id,
+            materialId,
+          })
+        );
+        //e novamente fazer essa inserão de dados com o bulkCreate
+        await MaterialCollectionPoint.bulkCreate(materialAssociations);
+      }
+
+      const updatedPoint = await RecyclingPoint.findByPk(id, {
+        include: [
+          {
+            model: Material,
+            through: {
+              attributes: [],
+            },
+          },
+        ],
+      });
+
+      return response.status(200).json(updatedPoint);
+    } catch (error) {
+      console.error(error);
+      return response.status(500).json({
+        message: "Erro ao atualizar ponto de coleta",
+        error: error.message,
+      });
+    }
+  }
+
+  async deleteRecyclingPoint(request, response) {
+    try {
+      const id = request.params.id;
+      const point = await RecyclingPoint.findByPk(id);
+
+      if (!point) {
+        response
+          .status(404)
+          .json({ message: "Ponto de coleta não encontrado" });
+      }
+
+      //como estamos lidando com tabelas associadas, essas associações precisam ser deletadas antes de deletar a tabela pai, para não gerar conflito
+      await MaterialCollectionPoint.destroy({ where: { collectPointId: id } });
+
+      await point.destroy();
+
+      return response.status(204).send();
+    } catch (error) {
+      console.error(error);
+      return response.status(500).json({
+        message: "Erro ao deletar ponto de coleta",
         error: error.message,
       });
     }
