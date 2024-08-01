@@ -32,9 +32,10 @@ class RecyclingPointController {
         street,
         longitude,
         latitude,
-        userId,
         materials,
       } = validatedData;
+
+      const { userId } = request;
 
       if (!Array.isArray(materials)) {
         return response
