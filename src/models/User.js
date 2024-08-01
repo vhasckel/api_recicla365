@@ -1,6 +1,9 @@
 const { DataTypes } = require("sequelize");
 const connection = require("../database/connection");
 const { hashSync } = require("bcryptjs");
+const Permission = require("./Permission");
+const UserPermisssion = require("./UserPermission");
+const UserPermission = require("./UserPermission");
 
 const User = connection.define("users", {
   name: {
@@ -41,6 +44,17 @@ const User = connection.define("users", {
     type: DataTypes.STRING,
     allowNull: false,
   },
+});
+
+User.belongsToMany(Permission, {
+  through: UserPermission,
+  foreignKey: "userId",
+  otherKey: "permissionId",
+});
+Permission.belongsToMany(User, {
+  through: UserPermission,
+  foreignKey: "permissionId",
+  otherKey: "userId",
 });
 
 User.beforeSave((user) => {

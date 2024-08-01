@@ -1,10 +1,29 @@
+const {
+  createUserRegisterSchema,
+} = require("../middlewares/validationSchemas");
 const User = require("../models/User");
-const Yup = require("yup");
 
 class UserController {
   async createAccount(request, response) {
     try {
       const data = request.body;
+
+      const validatedData = await createUserRegisterSchema.validate(
+        request.body,
+        { abortEarly: false }
+      );
+
+      const {
+        name,
+        gender,
+        cpf,
+        cep,
+        neighbourhood,
+        street,
+        number,
+        email,
+        passwordHash,
+      } = validatedData;
 
       const [emailVerify, cpfVerify] = await Promise.all([
         User.findOne({ where: { email: data.email } }),
@@ -24,15 +43,15 @@ class UserController {
       }
 
       const user = await User.create({
-        name: data.name,
-        gender: data.gender,
-        cpf: data.cpf,
-        cep: data.cep,
-        neighbourhood: data.neighbourhood,
-        street: data.street,
-        number: data.number,
-        email: data.email,
-        passwordHash: data.passwordHash,
+        name,
+        gender,
+        cpf,
+        cep,
+        neighbourhood,
+        street,
+        number,
+        email,
+        passwordHash,
       });
 
       response.status(201).json({
