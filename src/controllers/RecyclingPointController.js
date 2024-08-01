@@ -32,9 +32,16 @@ class RecyclingPointController {
         street,
         longitude,
         latitude,
-        userId,
         materials,
       } = validatedData;
+
+      const { userId } = request;
+
+      if (!Array.isArray(materials)) {
+        return response
+          .status(400)
+          .json({ message: "Materials precisa ser um Array de IDs" });
+      }
 
       const recyclingPoint = await RecyclingPoint.create({
         name,
