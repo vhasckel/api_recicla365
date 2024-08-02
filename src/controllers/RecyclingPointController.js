@@ -218,7 +218,7 @@ class RecyclingPointController {
 
       await point.destroy();
 
-      return response.status(204).send();
+      return response.status(204).json();
     } catch (error) {
       console.error(error);
       return response.status(500).json({
