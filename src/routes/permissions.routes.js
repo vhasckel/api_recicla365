@@ -1,12 +1,34 @@
 const { Router } = require("express");
 const PermissionController = require("../controllers/PermissionController");
+const verifyPermission = require("../middlewares/verifyPermission");
+const validateToken = require("../middlewares/validationToken");
 
 const permissionsRoutes = new Router();
 
-permissionsRoutes.post("/", PermissionController.createPermission);
-permissionsRoutes.get("/", PermissionController.getAllPermissions);
-permissionsRoutes.delete("/:id", PermissionController.deletePermission);
+permissionsRoutes.post(
+  "/",
+  validateToken,
+  verifyPermission(["adm"]),
+  PermissionController.createPermission
+);
+permissionsRoutes.get(
+  "/",
+  validateToken,
+  verifyPermission(["adm"]),
+  PermissionController.getAllPermissions
+);
+permissionsRoutes.delete(
+  "/:id",
+  validateToken,
+  verifyPermission(["adm"]),
+  PermissionController.deletePermission
+);
 
-permissionsRoutes.post("/atribuir", PermissionController.assignPermission);
+permissionsRoutes.post(
+  "/atribuir",
+  validateToken,
+  verifyPermission(["adm"]),
+  PermissionController.assignPermission
+);
 
 module.exports = permissionsRoutes;
