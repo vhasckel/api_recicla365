@@ -5,31 +5,10 @@ const validateToken = require("../middlewares/validationToken");
 
 const recyclingRoutes = new Router();
 
-recyclingRoutes.post(
-  "/cadastrar",
-  validateToken,
-  verifyPermission(["criar ponto"]),
-  RecyclingPointController.createCollectPoint
-);
-recyclingRoutes.get(
-  "/",
-  validateToken,
-  RecyclingPointController.getAllRecyclingPoints
-);
-recyclingRoutes.get(
-  "/:id",
-  validateToken,
-  RecyclingPointController.getOneRecyclingPoint
-);
-recyclingRoutes.put(
-  "/:id",
-  validateToken,
-  RecyclingPointController.updateRecyclingPoint
-);
-recyclingRoutes.delete(
-  "/:id",
-  validateToken,
-  RecyclingPointController.deleteRecyclingPoint
-);
+recyclingRoutes.post("/cadastrar", RecyclingPointController.createCollectPoint);
+recyclingRoutes.get("/", RecyclingPointController.getAllRecyclingPoints);
+recyclingRoutes.get("/:id", RecyclingPointController.getOneRecyclingPoint);
+recyclingRoutes.put("/:id", RecyclingPointController.updateRecyclingPoint);
+recyclingRoutes.delete("/:id", RecyclingPointController.deleteRecyclingPoint);
 
 module.exports = recyclingRoutes;
