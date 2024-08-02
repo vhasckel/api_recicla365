@@ -9,7 +9,11 @@ recyclingRoutes.post(
   validateToken,
   RecyclingPointController.createCollectPoint
 );
-recyclingRoutes.get("/", RecyclingPointController.getAllRecyclingPoints);
+recyclingRoutes.get(
+  "/",
+  validateToken,
+  RecyclingPointController.getAllRecyclingPoints
+);
 recyclingRoutes.get(
   "/:id",
   validateToken,

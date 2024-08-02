@@ -155,6 +155,16 @@ class RecyclingPointController {
           .status(404)
           .json({ message: "Ponto de coleta não encontrado" });
       }
+
+      if (point.userId !== request.userId) {
+        return response
+          .status(403)
+          .json({
+            message:
+              "Você não tem permissão para atualizar este ponto de coleta",
+          });
+      }
+
       point.name = validatedData.name;
       point.description = validatedData.description;
       point.cep = validatedData.cep;
@@ -211,6 +221,14 @@ class RecyclingPointController {
         response
           .status(404)
           .json({ message: "Ponto de coleta não encontrado" });
+      }
+
+      if (point.userId !== request.userId) {
+        return response
+          .status(403)
+          .json({
+            message: "Você não tem permissão para deletar este ponto de coleta",
+          });
       }
 
       //como estamos lidando com tabelas associadas, essas associações precisam ser deletadas antes de deletar a tabela pai, para não gerar conflito
