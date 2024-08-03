@@ -52,6 +52,7 @@ class RecyclingPointController {
         longitude,
         latitude,
         userId,
+        googleMapsLink,
       });
 
       //essa função cria a associação entre os pontos de coleta e os materiais
@@ -80,7 +81,6 @@ class RecyclingPointController {
 
       return response.status(201).json({
         recyclingPoint: pointWithMaterials,
-        googleMapsLink,
       });
     } catch (error) {
       console.error(error);
