@@ -1,6 +1,7 @@
 const {
   createUserRegisterSchema,
 } = require("../middlewares/validationSchemas");
+const { RecyclingPoint } = require("../models");
 const User = require("../models/User");
 
 class UserController {
@@ -64,6 +65,37 @@ class UserController {
       response
         .status(500)
         .json({ message: "Não foi possível cadastrar usuário." });
+    }
+  }
+
+  async deleteAccount(request, response) {
+    try {
+      const id = request.params.id;
+      const account = await User.findByPk(id);
+
+      if (!account) {
+        return response.status(404).json({ message: "Usuário não encontrado" });
+      }
+
+      const recyclingPoints = await RecyclingPoint.findAll({
+        where: { userId: id },
+      });
+
+      if (recyclingPoints.length > 0) {
+        return response.status(403).json({
+          message:
+            "Não é possível deletar a conta. Existem pontos de coleta vinculados a este usuário.",
+        });
+      }
+      await account.destroy();
+
+      return response.status(204).json();
+    } catch (error) {
+      console.error(error);
+      return response.status(500).json({
+        message: "Erro ao deletar usuário",
+        error: error.message,
+      });
     }
   }
 }
