@@ -15,22 +15,23 @@ recyclingRoutes.get(
   RecyclingPointController.getAllRecyclingPoints
 );
 recyclingRoutes.get(
-  "/me",
+  "/local",
   validateToken,
   RecyclingPointController.getMyRecyclingPoints
 );
+
 recyclingRoutes.get(
   "/:id",
   validateToken,
   RecyclingPointController.getOneRecyclingPoint
 );
 recyclingRoutes.put(
-  "/:id",
+  "/local/:id",
   validateToken,
   RecyclingPointController.updateRecyclingPoint
 );
 recyclingRoutes.delete(
-  "/:id",
+  "/local/:id",
   validateToken,
   RecyclingPointController.deleteRecyclingPoint
 );

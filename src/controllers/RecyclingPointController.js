@@ -99,7 +99,7 @@ class RecyclingPointController {
 
   async getMyRecyclingPoints(request, response) {
     try {
-      const userId = request.userId.id;
+      const userId = request.userId;
 
       const recyclingPoints = await RecyclingPoint.findAll({
         where: {

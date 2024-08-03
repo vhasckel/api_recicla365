@@ -12,7 +12,7 @@ function validateToken(request, response, next) {
 
     const result = verify(auth[1], process.env.JWT_SECRET);
 
-    request.userId = { id: result.id };
+    request.userId = result.id;
     console.log(`User ID from token: ${request.userId}`);
 
     next();
