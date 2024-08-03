@@ -5,9 +5,13 @@ const { RecyclingPoint } = require("../models");
 const User = require("../models/User");
 
 class UserController {
+  constructor() {
+    //vinculando o método handleError ao contexto da instância
+    this.handleError = this.handleError.bind(this);
+  }
   async getAllUsers(request, response) {
     try {
-      const users = await User.findAndCountAll({
+      const users = await User.findAll({
         attributes: ["id", "name"],
       });
 
@@ -18,16 +22,11 @@ class UserController {
       }
       return response.status(200).json(users);
     } catch (error) {
-      return response.status(500).json({
-        message: "Erro ao buscar pontos de coleta",
-        error: error.message,
-      });
+      return this.handleError(response, "Erro ao buscar usuários", error);
     }
   }
   async createAccount(request, response) {
     try {
-      const data = request.body;
-
       const validatedData = await createUserRegisterSchema.validate(
         request.body,
         { abortEarly: false }
@@ -46,8 +45,8 @@ class UserController {
       } = validatedData;
 
       const [emailVerify, cpfVerify] = await Promise.all([
-        User.findOne({ where: { email: data.email } }),
-        User.findOne({ where: { cpf: data.cpf } }),
+        User.findOne({ where: { email } }),
+        User.findOne({ where: { cpf } }),
       ]);
 
       if (emailVerify) {
@@ -80,23 +79,24 @@ class UserController {
         createdAt: user.createdAt,
       });
     } catch (error) {
-      console.error(error);
-      response
-        .status(500)
-        .json({ message: "Não foi possível cadastrar usuário." });
+      return this.handleError(
+        response,
+        "Não foi possível cadastrar usuário.",
+        error
+      );
     }
   }
 
   async deleteAccount(request, response) {
     try {
-      const id = request.params.id;
+      const { id } = request.params;
       const account = await User.findByPk(id);
 
       if (!account) {
         return response.status(404).json({ message: "Usuário não encontrado" });
       }
 
-      if (account.id !== request.userId.id) {
+      if (account.id !== request.userId) {
         return response.status(403).json({
           message:
             "Você não tem permissão para deletar a conta de outro usuário.",
@@ -115,19 +115,16 @@ class UserController {
       }
       await account.destroy();
 
-      return response.status(204).json();
+      return response.status(204).send();
     } catch (error) {
       console.error(error);
-      return response.status(500).json({
-        message: "Erro ao deletar usuário",
-        error: error.message,
-      });
+      return this.handleError(response, "Erro ao deletar usuário", error);
     }
   }
 
   async updateAccount(request, response) {
     try {
-      const id = request.params.id;
+      const { id } = request.params;
       const validatedData = await createUserRegisterSchema.validate(
         request.body,
         { abortEarly: false }
@@ -139,7 +136,7 @@ class UserController {
         response.status(404).json({ message: "Usuário não encontrado" });
       }
 
-      if (updatedAccount.id !== request.userId.id) {
+      if (updatedAccount.id !== request.userId) {
         return response.status(403).json({
           message: "Você não tem permissão para atualizar esta conta",
         });
@@ -156,6 +153,11 @@ class UserController {
         error: error.message,
       });
     }
+  }
+
+  handleError(response, message, error) {
+    console.error(error);
+    return response.status(500).json({ message, error: error.message });
   }
 }
 
