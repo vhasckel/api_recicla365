@@ -97,6 +97,25 @@ class RecyclingPointController {
     }
   }
 
+  async getMyRecyclingPoints(request, response) {
+    try {
+      const userId = request.userId.id;
+
+      const recyclingPoints = await RecyclingPoint.findAll({
+        where: {
+          userId,
+        },
+      });
+
+      return response.status(200).json(recyclingPoints);
+    } catch (error) {
+      console.error(error);
+      response
+        .status(500)
+        .json({ message: "Erro ao buscar os pontos de coleta do usuário." });
+    }
+  }
+
   async getOneRecyclingPoint(request, response) {
     try {
       const id = request.params.id;

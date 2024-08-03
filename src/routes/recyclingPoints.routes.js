@@ -15,6 +15,11 @@ recyclingRoutes.get(
   RecyclingPointController.getAllRecyclingPoints
 );
 recyclingRoutes.get(
+  "/me",
+  validateToken,
+  RecyclingPointController.getMyRecyclingPoints
+);
+recyclingRoutes.get(
   "/:id",
   validateToken,
   RecyclingPointController.getOneRecyclingPoint
