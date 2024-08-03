@@ -105,6 +105,39 @@ class UserController {
       });
     }
   }
+
+  async updateAccount(request, response) {
+    try {
+      const id = request.params.id;
+      const validatedData = await createUserRegisterSchema.validate(
+        request.body,
+        { abortEarly: false }
+      );
+
+      const updatedAccount = await User.findByPk(id);
+
+      if (!updatedAccount) {
+        response.status(404).json({ message: "Usuário não encontrado" });
+      }
+
+      if (updatedAccount.id !== request.userId.id) {
+        return response.status(403).json({
+          message: "Você não tem permissão para atualizar esta conta",
+        });
+      }
+
+      Object.assign(updatedAccount, validatedData);
+      await updatedAccount.save();
+
+      return response.status(200).json(updatedAccount);
+    } catch (error) {
+      console.error(error);
+      return response.status(500).json({
+        message: "Erro ao atualizar conta",
+        error: error.message,
+      });
+    }
+  }
 }
 
 module.exports = new UserController();
