@@ -4,6 +4,8 @@ const Material = require("../models/Material");
 const {
   createCollectPointSchema,
 } = require("../middlewares/validationSchemas");
+const { getMapData, getGoogleMapsLink } = require("../services/map.service");
+const getCepData = require("../services/cep.service");
 
 //feito a associação muitos-para-muitos RecyclingPoint e Material usando a tabela de junção MaterialCollectionPoint
 // - um ponto de coleta pode ter muitos tipos de materiais e um material pode ser aceito em muitos pontos de coleta;
@@ -24,17 +26,15 @@ class RecyclingPointController {
         { abortEarly: false }
       );
 
-      const {
-        name,
-        description,
-        cep,
-        neighbourhood,
-        street,
-        longitude,
-        latitude,
-        materials,
-      } = validatedData;
+      const { name, description, materials, cep } = validatedData;
 
+      const locationData = await getMapData(cep);
+      const googleMapsLink = await getGoogleMapsLink(locationData);
+      const { logradouro: street, bairro: neighbourhood } = await getCepData(
+        cep
+      );
+
+      const { lat: latitude, lon: longitude } = locationData;
       const { userId } = request;
 
       if (!Array.isArray(materials)) {
@@ -78,7 +78,10 @@ class RecyclingPointController {
         }
       );
 
-      return response.status(201).json(pointWithMaterials);
+      return response.status(201).json({
+        recyclingPoint: pointWithMaterials,
+        googleMapsLink,
+      });
     } catch (error) {
       console.error(error);
       return response.status(500).json({
@@ -157,12 +160,9 @@ class RecyclingPointController {
       }
 
       if (point.userId !== request.userId) {
-        return response
-          .status(403)
-          .json({
-            message:
-              "Você não tem permissão para atualizar este ponto de coleta",
-          });
+        return response.status(403).json({
+          message: "Você não tem permissão para atualizar este ponto de coleta",
+        });
       }
 
       point.name = validatedData.name;
@@ -224,11 +224,9 @@ class RecyclingPointController {
       }
 
       if (point.userId !== request.userId) {
-        return response
-          .status(403)
-          .json({
-            message: "Você não tem permissão para deletar este ponto de coleta",
-          });
+        return response.status(403).json({
+          message: "Você não tem permissão para deletar este ponto de coleta",
+        });
       }
 
       //como estamos lidando com tabelas associadas, essas associações precisam ser deletadas antes de deletar a tabela pai, para não gerar conflito
