@@ -26,6 +26,7 @@ const RecyclingPoint = connection.define("recycling_points", {
     type: DataTypes.DECIMAL(9, 6),
     allowNull: false,
   },
+  googleMapsLink: { type: DataTypes.STRING, allowNull: true },
   longitude: {
     type: DataTypes.DECIMAL(9, 6),
     allowNull: false,
