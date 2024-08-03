@@ -2,11 +2,21 @@ const Permission = require("../models/Permission");
 const User = require("../models/User");
 
 class PermissionController {
+  constructor() {
+    //vinculando o método handleError ao contexto da instância
+    this.handleError = this.handleError.bind(this);
+  }
   async createPermission(request, response) {
     try {
-      const description = request.body;
+      const { description } = request.body;
 
-      const permission = await Permission.create(description);
+      if (!description) {
+        return response
+          .status(400)
+          .json({ mensagem: "Descrição é obrigatória" });
+      }
+
+      const permission = await Permission.create({ description });
       response.status(201).json(permission);
     } catch (error) {
       console.error(error);
@@ -21,36 +31,40 @@ class PermissionController {
       const permissions = await Permission.findAll();
       response.json(permissions);
     } catch (error) {
-      response.status(500).json({
-        mensagem: "Houve um erro ao listar as permissoes",
-      });
+      this.handleError(
+        response,
+        "Houve um erro ao listar as permissões",
+        error
+      );
     }
   }
 
   async deletePermission(request, response) {
     try {
-      const id = request.params.id;
+      const { id } = request.params;
       const permission = await Permission.findByPk(id);
 
       if (!permission) {
-        response
-          .status(404)
-          .json({ mensagem: "Não foi encontrado a permissao" });
+        response.status(404).json({ mensagem: "Permissão não encontrada" });
       }
 
       await permission.destroy();
 
-      response.status(204).json();
+      return response.status(204).send();
     } catch (error) {
-      response.status(500).json({
-        mensagem: "Houve um erro ao deletar a permissao",
-      });
+      this.handleError(response, "Houve um erro ao deletar a permissão", error);
     }
   }
 
   async assignPermission(request, response) {
     try {
       const { userId, permissionId } = request.body;
+
+      if (!userId || !permissionId) {
+        return response
+          .status(400)
+          .json({ mensagem: "userId e permissionId são obrigatórios" });
+      }
 
       const user = await User.findByPk(userId);
       const permission = await Permission.findByPk(permissionId);
@@ -63,13 +77,15 @@ class PermissionController {
 
       await user.addPermission(permission);
 
-      // await permission.addUser(user);
-
-      response.status(204).json();
+      return response.status(204).send();
     } catch (error) {
-      console.log(error);
-      response.status(500).json({ mensagem: "A requisição falhou" });
+      this.handleError(response, "A requisição falhou", error);
     }
+  }
+
+  handleError(response, mensagem, error) {
+    console.error(error);
+    return response.status(500).json({ mensagem });
   }
 }
 

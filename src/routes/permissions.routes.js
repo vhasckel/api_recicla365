@@ -27,7 +27,6 @@ permissionsRoutes.delete(
 permissionsRoutes.post(
   "/atribuir",
   validateToken,
-  verifyPermission(["adm"]),
   PermissionController.assignPermission
 );
 
