@@ -1,22 +1,16 @@
-const MaterialCollectionPoint = require("../models/MaterialCollectionPoint");
-const RecyclingPoint = require("../models/RecyclingPoint");
-const Material = require("../models/Material");
+const {
+  RecyclingPoint,
+  Material,
+  MaterialCollectionPoint,
+} = require("../models");
 const {
   createCollectPointSchema,
 } = require("../middlewares/validationSchemas");
 const { getMapData, getGoogleMapsLink } = require("../services/map.service");
 const getCepData = require("../services/cep.service");
-
-//feito a associação muitos-para-muitos RecyclingPoint e Material usando a tabela de junção MaterialCollectionPoint
-// - um ponto de coleta pode ter muitos tipos de materiais e um material pode ser aceito em muitos pontos de coleta;
-RecyclingPoint.belongsToMany(Material, {
-  through: MaterialCollectionPoint,
-  foreignKey: "collectPointId",
-});
-Material.belongsToMany(RecyclingPoint, {
-  through: MaterialCollectionPoint,
-  foreignKey: "materialId",
-});
+const {
+  associateMaterials,
+} = require("../services/associateMaterials.service");
 
 class RecyclingPointController {
   async createCollectPoint(request, response) {
@@ -27,13 +21,11 @@ class RecyclingPointController {
       );
 
       const { name, description, materials, cep } = validatedData;
-
       const locationData = await getMapData(cep);
       const googleMapsLink = await getGoogleMapsLink(locationData);
       const { logradouro: street, bairro: neighbourhood } = await getCepData(
         cep
       );
-
       const { lat: latitude, lon: longitude } = locationData;
       const { userId } = request;
 
@@ -55,14 +47,7 @@ class RecyclingPointController {
         googleMapsLink,
       });
 
-      //essa função cria a associação entre os pontos de coleta e os materiais
-      const materialAssociations = materials.map((materialId) => ({
-        collectPointId: recyclingPoint.id,
-        materialId,
-      }));
-
-      //bulkCreate é um método do sequelize que permite introduzir vários registros de uma vez, é ele quem insere múltiplos registros na tabela de junção
-      await MaterialCollectionPoint.bulkCreate(materialAssociations);
+      await associateMaterials(recyclingPoint.id, materials);
 
       //recupera o ponto de coleta com todos os materiais associados. 'attributes: []' exclui outros detalhes da tabela de junção
       const pointWithMaterials = await RecyclingPoint.findByPk(
@@ -165,14 +150,7 @@ class RecyclingPointController {
         });
       }
 
-      point.name = validatedData.name;
-      point.description = validatedData.description;
-      point.cep = validatedData.cep;
-      point.neighbourhood = validatedData.neighbourhood;
-      point.street = validatedData.street;
-      point.longitude = validatedData.latitude;
-      point.latitude = validatedData.latitude;
-      point.materials = validatedData.materials;
+      Object.assign(point, validatedData);
       await point.save();
 
       //para poder atualizar os tipos de materiais, precisamos primeiro limpar os dados que estavam salvos
