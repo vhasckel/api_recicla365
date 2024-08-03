@@ -77,6 +77,13 @@ class UserController {
         return response.status(404).json({ message: "Usuário não encontrado" });
       }
 
+      if (account.id !== request.userId.id) {
+        return response.status(403).json({
+          message:
+            "Você não tem permissão para deletar a conta de outro usuário.",
+        });
+      }
+
       const recyclingPoints = await RecyclingPoint.findAll({
         where: { userId: id },
       });
