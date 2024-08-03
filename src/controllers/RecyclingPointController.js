@@ -13,6 +13,10 @@ const {
 } = require("../services/associateMaterials.service");
 
 class RecyclingPointController {
+  constructor() {
+    //vinculando o método handleError ao contexto da instância
+    this.handleError = this.handleError.bind(this);
+  }
   async createCollectPoint(request, response) {
     try {
       const validatedData = await createCollectPointSchema.validate(
@@ -68,11 +72,7 @@ class RecyclingPointController {
         recyclingPoint: pointWithMaterials,
       });
     } catch (error) {
-      console.error(error);
-      return response.status(500).json({
-        message: "Erro ao criar ponto de coleta",
-        error: error.message,
-      });
+      this.handleError(response, "Erro ao criar ponto de coleta", error);
     }
   }
 
@@ -89,17 +89,13 @@ class RecyclingPointController {
       }
       return response.status(200).json(points);
     } catch (error) {
-      console.error(error);
-      return response.status(500).json({
-        message: "Erro ao buscar pontos de coleta",
-        error: error.message,
-      });
+      this.handleError(response, "Erro ao buscar pontos de coleta", error);
     }
   }
 
   async getMyRecyclingPoints(request, response) {
     try {
-      const userId = request.userId;
+      const { userId } = request;
 
       const recyclingPoints = await RecyclingPoint.findAll({
         where: {
@@ -109,16 +105,17 @@ class RecyclingPointController {
 
       return response.status(200).json(recyclingPoints);
     } catch (error) {
-      console.error(error);
-      response
-        .status(500)
-        .json({ message: "Erro ao buscar os pontos de coleta do usuário." });
+      this.handleError(
+        response,
+        "Erro ao buscar os pontos de coleta do usuário.",
+        error
+      );
     }
   }
 
   async getOneRecyclingPoint(request, response) {
     try {
-      const id = request.params.id;
+      const { id } = request.params;
       //se quiser que apareça os materiais junto com essa requisição, é preciso incluir o model de Material
       const point = await RecyclingPoint.findByPk(id, {
         include: [
@@ -139,17 +136,13 @@ class RecyclingPointController {
 
       return response.status(200).json(point);
     } catch (error) {
-      console.error(error);
-      return response.status(500).json({
-        message: "Erro ao buscar ponto de coleta",
-        error: error.message,
-      });
+      this.handleError(response, "Erro ao buscar ponto de coleta", error);
     }
   }
 
   async updateRecyclingPoint(request, response) {
     try {
-      const id = request.params.id;
+      const { id } = request.params;
       const validatedData = await createCollectPointSchema.validate(
         request.body,
         { abortEarly: false }
@@ -211,7 +204,7 @@ class RecyclingPointController {
 
   async deleteRecyclingPoint(request, response) {
     try {
-      const id = request.params.id;
+      const { id } = request.params;
       const point = await RecyclingPoint.findByPk(id);
 
       if (!point) {
@@ -233,12 +226,13 @@ class RecyclingPointController {
 
       return response.status(204).json();
     } catch (error) {
-      console.error(error);
-      return response.status(500).json({
-        message: "Erro ao deletar ponto de coleta",
-        error: error.message,
-      });
+      this.handleError(response, "Erro ao atualizar ponto de coleta", error);
     }
+  }
+
+  handleError(response, message, error) {
+    console.error(error);
+    return response.status(500).json({ message, error: error.message });
   }
 }
 
