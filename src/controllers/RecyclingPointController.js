@@ -11,12 +11,9 @@ const getCepData = require("../services/cep.service");
 const {
   associateMaterials,
 } = require("../services/associateMaterials.service");
+const handleError = require("../services/handleErros.service");
 
 class RecyclingPointController {
-  constructor() {
-    //vinculando o método handleError ao contexto da instância
-    this.handleError = this.handleError.bind(this);
-  }
   async createCollectPoint(request, response) {
     try {
       const validatedData = await createCollectPointSchema.validate(
@@ -72,7 +69,7 @@ class RecyclingPointController {
         recyclingPoint: pointWithMaterials,
       });
     } catch (error) {
-      this.handleError(response, "Erro ao criar ponto de coleta", error);
+      handleError(response, "Erro ao criar ponto de coleta", error);
     }
   }
 
@@ -89,7 +86,7 @@ class RecyclingPointController {
       }
       return response.status(200).json(points);
     } catch (error) {
-      this.handleError(response, "Erro ao buscar pontos de coleta", error);
+      handleError(response, "Erro ao buscar pontos de coleta", error);
     }
   }
 
@@ -105,7 +102,7 @@ class RecyclingPointController {
 
       return response.status(200).json(recyclingPoints);
     } catch (error) {
-      this.handleError(
+      handleError(
         response,
         "Erro ao buscar os pontos de coleta do usuário.",
         error
@@ -136,7 +133,7 @@ class RecyclingPointController {
 
       return response.status(200).json(point);
     } catch (error) {
-      this.handleError(response, "Erro ao buscar ponto de coleta", error);
+      handleError(response, "Erro ao buscar ponto de coleta", error);
     }
   }
 
@@ -194,11 +191,7 @@ class RecyclingPointController {
 
       return response.status(200).json(updatedPoint);
     } catch (error) {
-      console.error(error);
-      return response.status(500).json({
-        message: "Erro ao atualizar ponto de coleta",
-        error: error.message,
-      });
+      handleError(response, "Erro ao atulizar ponto de coleta", error);
     }
   }
 
@@ -213,7 +206,7 @@ class RecyclingPointController {
           .json({ message: "Ponto de coleta não encontrado" });
       }
 
-      if (point.userId !== request.userId) {
+      if (point.userId !== request.userId.id) {
         return response.status(403).json({
           message: "Você não tem permissão para deletar este ponto de coleta",
         });
@@ -226,13 +219,8 @@ class RecyclingPointController {
 
       return response.status(204).json();
     } catch (error) {
-      this.handleError(response, "Erro ao atualizar ponto de coleta", error);
+      handleError(response, "Erro ao deletar ponto de coleta", error);
     }
-  }
-
-  handleError(response, message, error) {
-    console.error(error);
-    return response.status(500).json({ message, error: error.message });
   }
 }
 

@@ -3,12 +3,9 @@ const {
 } = require("../middlewares/validationSchemas");
 const { RecyclingPoint } = require("../models");
 const User = require("../models/User");
+const handleError = require("../services/handleErros.service");
 
 class UserController {
-  constructor() {
-    //vinculando o método handleError ao contexto da instância
-    this.handleError = this.handleError.bind(this);
-  }
   async getAllUsers(request, response) {
     try {
       const users = await User.findAll({
@@ -22,7 +19,7 @@ class UserController {
       }
       return response.status(200).json(users);
     } catch (error) {
-      return this.handleError(response, "Erro ao buscar usuários", error);
+      handleError(response, "Erro ao buscar usuários", error);
     }
   }
   async createAccount(request, response) {
@@ -79,11 +76,7 @@ class UserController {
         createdAt: user.createdAt,
       });
     } catch (error) {
-      return this.handleError(
-        response,
-        "Não foi possível cadastrar usuário.",
-        error
-      );
+      handleError(response, "Não foi possível cadastrar usuário.", error);
     }
   }
 
@@ -117,8 +110,7 @@ class UserController {
 
       return response.status(204).send();
     } catch (error) {
-      console.error(error);
-      return this.handleError(response, "Erro ao deletar usuário", error);
+      handleError(response, "Erro ao deletar usuário", error);
     }
   }
 
@@ -147,17 +139,8 @@ class UserController {
 
       return response.status(200).json(updatedAccount);
     } catch (error) {
-      console.error(error);
-      return response.status(500).json({
-        message: "Erro ao atualizar conta",
-        error: error.message,
-      });
+      handleError(response, "Erro ao atualizar conta", error);
     }
-  }
-
-  handleError(response, message, error) {
-    console.error(error);
-    return response.status(500).json({ message, error: error.message });
   }
 }
 

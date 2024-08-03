@@ -19,10 +19,7 @@ class PermissionController {
       const permission = await Permission.create({ description });
       response.status(201).json(permission);
     } catch (error) {
-      console.error(error);
-      response.status(500).json({
-        mensagem: "Houve um erro ao cadastrar a permissao",
-      });
+      handleError(response, "Erro ao criar permissão", error);
     }
   }
 
@@ -31,11 +28,7 @@ class PermissionController {
       const permissions = await Permission.findAll();
       response.json(permissions);
     } catch (error) {
-      this.handleError(
-        response,
-        "Houve um erro ao listar as permissões",
-        error
-      );
+      handleError(response, "Erro ao buscar permissões", error);
     }
   }
 
@@ -52,7 +45,7 @@ class PermissionController {
 
       return response.status(204).send();
     } catch (error) {
-      this.handleError(response, "Houve um erro ao deletar a permissão", error);
+      handleError(response, "Erro ao deletar permissão", error);
     }
   }
 
@@ -79,13 +72,8 @@ class PermissionController {
 
       return response.status(204).send();
     } catch (error) {
-      this.handleError(response, "A requisição falhou", error);
+      handleError(response, "Erro ao atribuir permissão", error);
     }
-  }
-
-  handleError(response, mensagem, error) {
-    console.error(error);
-    return response.status(500).json({ mensagem });
   }
 }
 

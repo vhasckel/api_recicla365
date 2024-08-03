@@ -21,7 +21,7 @@ recyclingRoutes.get(
 );
 
 recyclingRoutes.get(
-  "/:id",
+  "/detalhes/:id",
   validateToken,
   RecyclingPointController.getOneRecyclingPoint
 );

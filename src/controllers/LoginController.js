@@ -1,6 +1,7 @@
 const { compareSync } = require("bcryptjs");
 const User = require("../models/User");
 const { sign } = require("jsonwebtoken");
+const handleError = require("../services/handleErros.service");
 
 class LoginController {
   async login(request, response) {
@@ -49,10 +50,7 @@ class LoginController {
         name: user.name,
       });
     } catch (error) {
-      console.error(error);
-      response
-        .status(500)
-        .json({ message: "Não foi possível realizar login." });
+      handleError(response, "Não foi possível realizar login", error);
     }
   }
 }
