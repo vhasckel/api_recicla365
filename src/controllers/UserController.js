@@ -5,6 +5,25 @@ const { RecyclingPoint } = require("../models");
 const User = require("../models/User");
 
 class UserController {
+  async getAllUsers(request, response) {
+    try {
+      const users = await User.findAndCountAll({
+        attributes: ["id", "name"],
+      });
+
+      if (users.length === 0) {
+        response
+          .status(404)
+          .json({ message: "Não foi encontrado nenhum usuário" });
+      }
+      return response.status(200).json(users);
+    } catch (error) {
+      return response.status(500).json({
+        message: "Erro ao buscar pontos de coleta",
+        error: error.message,
+      });
+    }
+  }
   async createAccount(request, response) {
     try {
       const data = request.body;
