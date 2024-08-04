@@ -2,10 +2,6 @@ const Permission = require("../models/Permission");
 const User = require("../models/User");
 
 class PermissionController {
-  constructor() {
-    //vinculando o método handleError ao contexto da instância
-    this.handleError = this.handleError.bind(this);
-  }
   async createPermission(request, response) {
     try {
       const { description } = request.body;

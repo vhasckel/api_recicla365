@@ -137,6 +137,28 @@ class RecyclingPointController {
     }
   }
 
+  async getLinkMap(request, response) {
+    try {
+      const { id } = request.params;
+
+      const point = await RecyclingPoint.findByPk(id, {
+        attributes: ["id", "name", "googleMapsLink"],
+      });
+
+      if (!point) {
+        return response
+          .status(404)
+          .json({ message: "Ponto de coleta não encontrado" });
+      }
+
+      return response
+        .status(200)
+        .json({ googleMapsLink: point.googleMapsLink });
+    } catch (error) {
+      handleError(response, "Erro ao buscar link do Google Maps", error);
+    }
+  }
+
   async updateRecyclingPoint(request, response) {
     try {
       const { id } = request.params;
