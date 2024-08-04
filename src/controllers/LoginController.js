@@ -45,7 +45,7 @@ class LoginController {
         { expiresIn: "1d" }
       );
 
-      response.json({
+      return response.json({
         token: token,
         name: user.name,
       });

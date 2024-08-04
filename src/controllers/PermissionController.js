@@ -13,7 +13,7 @@ class PermissionController {
       }
 
       const permission = await Permission.create({ description });
-      response.status(201).json(permission);
+      return response.status(201).json(permission);
     } catch (error) {
       handleError(response, "Erro ao criar permissão", error);
     }
@@ -22,7 +22,7 @@ class PermissionController {
   async getAllPermissions(request, response) {
     try {
       const permissions = await Permission.findAll();
-      response.json(permissions);
+      return response.json(permissions);
     } catch (error) {
       handleError(response, "Erro ao buscar permissões", error);
     }
@@ -34,7 +34,9 @@ class PermissionController {
       const permission = await Permission.findByPk(id);
 
       if (!permission) {
-        response.status(404).json({ mensagem: "Permissão não encontrada" });
+        return response
+          .status(404)
+          .json({ mensagem: "Permissão não encontrada" });
       }
 
       await permission.destroy();
@@ -59,7 +61,7 @@ class PermissionController {
       const permission = await Permission.findByPk(permissionId);
 
       if (!user || !permission) {
-        response
+        return response
           .status(404)
           .json({ mensagem: "Usuário ou permissão não encontrados" });
       }

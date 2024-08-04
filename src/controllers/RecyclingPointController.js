@@ -80,7 +80,7 @@ class RecyclingPointController {
       });
 
       if (points.length === 0) {
-        response
+        return response
           .status(404)
           .json({ message: "Não foi encontrado nenhum ponto de coleta" });
       }
@@ -126,7 +126,7 @@ class RecyclingPointController {
       });
 
       if (!point) {
-        response
+        return response
           .status(404)
           .json({ message: "Ponto de coleta não encontrado" });
       }
@@ -170,7 +170,7 @@ class RecyclingPointController {
       const point = await RecyclingPoint.findByPk(id);
 
       if (!point) {
-        response
+        return response
           .status(404)
           .json({ message: "Ponto de coleta não encontrado" });
       }
@@ -223,12 +223,12 @@ class RecyclingPointController {
       const point = await RecyclingPoint.findByPk(id);
 
       if (!point) {
-        response
+        return response
           .status(404)
           .json({ message: "Ponto de coleta não encontrado" });
       }
 
-      if (point.userId !== request.userId.id) {
+      if (point.userId !== request.userId) {
         return response.status(403).json({
           message: "Você não tem permissão para deletar este ponto de coleta",
         });
@@ -239,7 +239,7 @@ class RecyclingPointController {
 
       await point.destroy();
 
-      return response.status(204).json();
+      return response.status(204).send();
     } catch (error) {
       handleError(response, "Erro ao deletar ponto de coleta", error);
     }

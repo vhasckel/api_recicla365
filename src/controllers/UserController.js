@@ -13,7 +13,7 @@ class UserController {
       });
 
       if (users.length === 0) {
-        response
+        return response
           .status(404)
           .json({ message: "Não foi encontrado nenhum usuário" });
       }
@@ -125,7 +125,7 @@ class UserController {
       const updatedAccount = await User.findByPk(id);
 
       if (!updatedAccount) {
-        response.status(404).json({ message: "Usuário não encontrado" });
+        return response.status(404).json({ message: "Usuário não encontrado" });
       }
 
       if (updatedAccount.id !== request.userId) {
