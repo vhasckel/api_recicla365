@@ -1,0 +1,903 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "API recicla365",
+    "description": "Documentação da API recicla365 usando Express e Sequelize",
+    "version": "1.0.0"
+  },
+  "host": "localhost:3000",
+  "basePath": "/",
+  "schemes": [
+    "http"
+  ],
+  "securityDefinitions": {
+    "apiKeyAuth": {
+      "type": "apiKey",
+      "in": "header",
+      "name": "Authorization",
+      "description": "Insira o token JWT"
+    }
+  },
+  "paths": {
+    "/usuarios/cadastrar": {
+      "post": {
+        "tags": [
+          "Usuários"
+        ],
+        "description": "Endpoint para criar uma nova conta de usuário",
+        "parameters": [
+          {
+            "name": "createAccount",
+            "in": "body",
+            "description": "Dados do novo usuário",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "example": "Nome do Usuário"
+                },
+                "gender": {
+                  "type": "string",
+                  "example": "feminino"
+                },
+                "cpf": {
+                  "type": "string",
+                  "example": "99999999999"
+                },
+                "cep": {
+                  "type": "string",
+                  "example": "88036280"
+                },
+                "neighbourhood": {
+                  "type": "string",
+                  "example": "trindade"
+                },
+                "street": {
+                  "type": "string",
+                  "example": "prof. enoe schutel"
+                },
+                "number": {
+                  "type": "number",
+                  "example": 286
+                },
+                "email": {
+                  "type": "string",
+                  "example": "email@exemplo.com"
+                },
+                "passwordHash": {
+                  "type": "string",
+                  "example": "senha123"
+                }
+              },
+              "required": [
+                "name",
+                "gender",
+                "cpf",
+                "cep",
+                "neighbourhood",
+                "street",
+                "number",
+                "email",
+                "passwordHash"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Usuário criado com sucesso"
+          },
+          "400": {
+            "description": "Erro de validação"
+          },
+          "409": {
+            "description": "Conflict"
+          }
+        }
+      }
+    },
+    "/usuarios/deletar/{id}": {
+      "delete": {
+        "tags": [
+          "Usuários"
+        ],
+        "description": "Endpoint para deletar uma conta de usuário",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "ID do usuário",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Usuário deletado com sucesso"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Usuário não tem permissão para deletar esta conta"
+          },
+          "404": {
+            "description": "Usuário não encontrado"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/usuarios/atualizar/{id}": {
+      "put": {
+        "tags": [
+          "Usuários"
+        ],
+        "description": "Endpoint para atualizar uma conta de usuário",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "ID do usuário",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "updateAccount",
+            "in": "body",
+            "description": "Dados atualizados do usuário",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "example": "Nome Atualizado"
+                },
+                "gender": {
+                  "type": "string",
+                  "example": "feminino"
+                },
+                "cpf": {
+                  "type": "string",
+                  "example": "99999999999"
+                },
+                "cep": {
+                  "type": "string",
+                  "example": "88036280"
+                },
+                "neighbourhood": {
+                  "type": "string",
+                  "example": "trindade"
+                },
+                "street": {
+                  "type": "string",
+                  "example": "prof. enoe schutel"
+                },
+                "number": {
+                  "type": "number",
+                  "example": 286
+                },
+                "email": {
+                  "type": "string",
+                  "example": "email@exemplo.com"
+                },
+                "passwordHash": {
+                  "type": "string",
+                  "example": "novaSenha123"
+                }
+              },
+              "required": [
+                "name",
+                "gender",
+                "cpf",
+                "cep",
+                "neighbourhood",
+                "street",
+                "number",
+                "email",
+                "passwordHash"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Usuário atualizado com sucesso"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Usuário não tem permissão para atualizar esta conta"
+          },
+          "404": {
+            "description": "Usuário não encontrado"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/usuarios/": {
+      "get": {
+        "tags": [
+          "Usuários"
+        ],
+        "description": "Endpoint para obter todos os usuários",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de usuários"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Nenhum usuário encontrado"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/login/": {
+      "post": {
+        "tags": [
+          "Usuários"
+        ],
+        "description": "Endpoint para logar um usuário",
+        "parameters": [
+          {
+            "name": "loginUsuario",
+            "in": "body",
+            "description": "Login do usuário",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "type": "string",
+                  "example": "teste@gmail.com"
+                },
+                "passwordHash": {
+                  "type": "string",
+                  "example": "teste123"
+                }
+              },
+              "required": [
+                "email",
+                "passwordHash"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/pontosDeColeta/cadastrar": {
+      "post": {
+        "tags": [
+          "Pontos de Coleta"
+        ],
+        "description": "Endpoint para criar ponto de coleta",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "createCollectPoint",
+            "in": "body",
+            "description": "Dados para pontos de coleta",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "example": "Ponto de Coleta A"
+                },
+                "description": {
+                  "type": "string",
+                  "example": "Descrição do ponto de coleta"
+                },
+                "cep": {
+                  "type": "number",
+                  "example": 88036280
+                },
+                "neighbourhood": {
+                  "type": "string",
+                  "example": "trindade"
+                },
+                "street": {
+                  "type": "string",
+                  "example": "prof. enoe schutel"
+                },
+                "longitude": {
+                  "type": "number",
+                  "example": 48.222
+                },
+                "latitude": {
+                  "type": "number",
+                  "example": 27.564
+                },
+                "userId": {
+                  "type": "number",
+                  "example": 11
+                },
+                "materials": {
+                  "type": "array",
+                  "example": [
+                    1,
+                    2,
+                    3
+                  ],
+                  "items": {
+                    "type": "number"
+                  }
+                }
+              },
+              "required": [
+                "name",
+                "description",
+                "cep",
+                "neighbourhood",
+                "street",
+                "longitude",
+                "latitude",
+                "userId",
+                "materials"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Ponto de coleta criado com sucesso"
+          },
+          "400": {
+            "description": "Erro de validação"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/pontosDeColeta/": {
+      "get": {
+        "tags": [
+          "Pontos de Coleta"
+        ],
+        "description": "Endpoint para buscar todos os pontos de coleta",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de pontos de coleta"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Nenhum ponto de coleta encontrado"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/pontosDeColeta/local": {
+      "get": {
+        "tags": [
+          "Pontos de Coleta"
+        ],
+        "description": "Endpoint para buscar todos os pontos de um usuário logado",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de pontos de coleta do usuário"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Nenhum ponto de coleta encontrado"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/pontosDeColeta/detalhes/{id}": {
+      "get": {
+        "tags": [
+          "Pontos de Coleta"
+        ],
+        "description": "Endpoint para buscar por id um ponto de coleta específico",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "ID do ponto de coleta",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Detalhes do ponto de coleta"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Ponto de coleta não encontrado"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/pontosDeColeta/local/{id}": {
+      "put": {
+        "tags": [
+          "Pontos de Coleta"
+        ],
+        "description": "Endpoint para atualizar um ponto de coleta por ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "ID do ponto de coleta",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "updateRecyclingPoint",
+            "in": "body",
+            "description": "Dados atualizados para o ponto de coleta",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "example": "Ponto de Coleta A"
+                },
+                "description": {
+                  "type": "string",
+                  "example": "Descrição do ponto de coleta"
+                },
+                "cep": {
+                  "type": "number",
+                  "example": 88036280
+                },
+                "neighbourhood": {
+                  "type": "string",
+                  "example": "trindade"
+                },
+                "street": {
+                  "type": "string",
+                  "example": "prof. enoe schutel"
+                },
+                "longitude": {
+                  "type": "number",
+                  "example": 48.222
+                },
+                "latitude": {
+                  "type": "number",
+                  "example": 27.564
+                },
+                "userId": {
+                  "type": "number",
+                  "example": 11
+                },
+                "materials": {
+                  "type": "array",
+                  "example": [
+                    1,
+                    2,
+                    3
+                  ],
+                  "items": {
+                    "type": "number"
+                  }
+                }
+              },
+              "required": [
+                "name",
+                "description",
+                "cep",
+                "neighbourhood",
+                "street",
+                "longitude",
+                "latitude",
+                "userId",
+                "materials"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ponto de coleta atualizado com sucesso"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Usuário não tem permissão para atualizar este ponto de coleta"
+          },
+          "404": {
+            "description": "Ponto de coleta não encontrado"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Pontos de Coleta"
+        ],
+        "description": "Endpoint para deletar ponto de coleta por ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "ID do ponto de coleta",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Ponto de coleta deletado com sucesso"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Usuário não tem permissão para deletar este ponto de coleta"
+          },
+          "404": {
+            "description": "Ponto de coleta não encontrado"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/pontosDeColeta/local/{id}/maps": {
+      "get": {
+        "tags": [
+          "Pontos de Coleta"
+        ],
+        "description": "Endpoint para buscar o link do Google Maps através do ID de um ponto de coleta",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "ID do ponto de coleta",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Link do Google Maps para o ponto de coleta"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Ponto de coleta não encontrado"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/permissoes/": {
+      "post": {
+        "tags": [
+          "Permissões"
+        ],
+        "description": "Endpoint para criar uma permissão",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "createPermission",
+            "in": "body",
+            "description": "Dados da permissão",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "description": {
+                  "type": "string",
+                  "example": "Descrição da permissão"
+                }
+              },
+              "required": [
+                "description"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Permissão criada com sucesso"
+          },
+          "400": {
+            "description": "Erro de validação: descrição é obrigatória"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Permissões"
+        ],
+        "description": "Endpoint para buscar todas as permissões",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de permissões"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Erro ao buscar permissões"
+          }
+        }
+      }
+    },
+    "/permissoes/{id}": {
+      "delete": {
+        "tags": [
+          "Permissões"
+        ],
+        "description": "Endpoint para deletar uma permissão por ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "ID da permissão",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Permissão deletada com sucesso"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Permissão não encontrada"
+          },
+          "500": {
+            "description": "Erro ao deletar permissão"
+          }
+        }
+      }
+    },
+    "/permissoes/atribuir": {
+      "post": {
+        "tags": [
+          "Permissões"
+        ],
+        "description": "Endpoint para atribuir uma permissão a um usuário",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "assignPermission",
+            "in": "body",
+            "description": "Dados para atribuição de permissão",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "userId": {
+                  "type": "number",
+                  "example": 1
+                },
+                "permissionId": {
+                  "type": "number",
+                  "example": 2
+                }
+              },
+              "required": [
+                "userId",
+                "permissionId"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Permissão atribuída com sucesso"
+          },
+          "400": {
+            "description": "Erro de validação: userId e permissionId são obrigatórios"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Usuário ou permissão não encontrados"
+          },
+          "500": {
+            "description": "Erro ao atribuir permissão"
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "apiKeyAuth": []
+    }
+  ]
+}

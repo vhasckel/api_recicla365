@@ -71,6 +71,7 @@ class UserController {
       });
 
       response.status(201).json({
+        id: user.id,
         name: user.name,
         email: user.email,
         createdAt: user.createdAt,
