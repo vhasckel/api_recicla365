@@ -18,6 +18,8 @@ Além disso, os usuários têm a capacidade de cadastrar novos pontos de coleta,
 
 ## Diagrama de tabelas
 
+![drawSQL-image-export-2024-08-04](https://github.com/user-attachments/assets/82d6168f-6383-420f-80a3-8a4180bbd3fa)
+
 ## Melhorias
 
 - aprimorar a segurança, exigindo senhas mais fortes;
