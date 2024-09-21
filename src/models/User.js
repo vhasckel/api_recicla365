@@ -2,7 +2,6 @@ const { DataTypes } = require("sequelize");
 const connection = require("../database/connection");
 const { hashSync } = require("bcryptjs");
 const Permission = require("./Permission");
-const UserPermisssion = require("./UserPermission");
 const UserPermission = require("./UserPermission");
 
 const User = connection.define("users", {
@@ -43,7 +42,10 @@ const User = connection.define("users", {
     type: DataTypes.INTEGER,
     allowNull: false,
   },
-
+  birthdate: {
+    type: DataTypes.DATEONLY,
+    allowNull: false,
+  },
   email: {
     type: DataTypes.STRING(255),
     allowNull: false,

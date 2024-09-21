@@ -39,6 +39,7 @@ class UserController {
         neighbourhood,
         street,
         number,
+        birthdate,
         email,
         passwordHash,
       } = validatedData;
@@ -70,6 +71,7 @@ class UserController {
         neighbourhood,
         street,
         number,
+        birthdate,
         email,
         passwordHash,
       });
