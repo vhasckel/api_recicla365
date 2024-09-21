@@ -23,6 +23,14 @@ const User = connection.define("users", {
     type: DataTypes.STRING(8),
     allowNull: false,
   },
+  city: {
+    type: DataTypes.STRING(100),
+    allowNull: false,
+  },
+  state: {
+    type: DataTypes.STRING(2),
+    allowNull: false,
+  },
   neighbourhood: {
     type: DataTypes.STRING(50),
     allowNull: false,
@@ -35,6 +43,7 @@ const User = connection.define("users", {
     type: DataTypes.INTEGER,
     allowNull: false,
   },
+
   email: {
     type: DataTypes.STRING(255),
     allowNull: false,
