@@ -19,17 +19,3 @@ Além disso, os usuários têm a capacidade de cadastrar novos pontos de coleta,
 ## Diagrama de tabelas
 
 ![drawSQL-image-export-2024-08-04](https://github.com/user-attachments/assets/82d6168f-6383-420f-80a3-8a4180bbd3fa)
-
-## Melhorias
-
-- aprimorar a segurança, exigindo senhas mais fortes;
-- eliminar inconsistências, como permitir que usuário possa editar seu CPF;
-- escalar sistema para que cada ponto de coleta trabalhe com uma capacidade máxima, para que assim empresas responsáveis pela coleta desses resíduos saibam quais são os pontos que precisam de coleta.
-
-## Vídeo
-
-https://drive.google.com/file/d/1N-vCKLXKuf0VRp8d_ZE2Muf0bWs4TgUf/view?usp=drive_link
-
-## Trello
-
-https://trello.com/invite/b/66270cc23daf0e56147f68d1/ATTIc7a411631312e7ab42994e78f909f4d7E251C156/eco365
