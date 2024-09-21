@@ -17,9 +17,12 @@ usersRoutes.post(
             $name: "Nome do Usuário",
             $gender: "feminino",
             $cpf: "99999999999",
+            $birthdate: "01/01/2000",
             $cep: "88036280",
             $neighbourhood: "trindade",
             $street: "prof. enoe schutel",
+            $city: "Florianópolis",
+            $state: "SC",
             $number: 286,
             $email: "email@exemplo.com",
             $passwordHash: "senha123"
