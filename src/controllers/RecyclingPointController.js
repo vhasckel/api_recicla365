@@ -12,6 +12,7 @@ const {
   associateMaterials,
 } = require("../services/associateMaterials.service");
 const handleError = require("../services/handleErros.service");
+const { Op } = require("sequelize");
 
 class RecyclingPointController {
   async createCollectPoint(request, response) {
@@ -30,10 +31,46 @@ class RecyclingPointController {
       const { lat: latitude, lon: longitude } = locationData;
       const { userId } = request;
 
+      // verificação se materials é um array
       if (!Array.isArray(materials)) {
         return response
           .status(400)
           .json({ message: "Materials precisa ser um Array de IDs" });
+      }
+
+      // verificação se o array não está vazio
+      if (materials.length === 0) {
+        return response.status(400).json({
+          message: "O array de materials não pode estar vazio",
+        });
+      }
+
+      // busca os materiais pelo array de IDs
+      const existingMaterials = await Material.findAll({
+        where: {
+          id: {
+            [Op.in]: materials,
+          },
+        },
+        attributes: ["id"],
+      });
+
+      // extrai os IDs dos materiais encontrados
+      const existingMaterialIds = existingMaterials.map(
+        (material) => material.id
+      );
+
+      // verifica se todos os IDs enviados estão presentes na tabela materials
+      const missingMaterials = materials.filter(
+        (materialId) => !existingMaterialIds.includes(materialId)
+      );
+
+      if (missingMaterials.length > 0) {
+        return response.status(400).json({
+          message: `Os seguintes IDs de materials são inválidos: ${missingMaterials.join(
+            ", "
+          )}`,
+        });
       }
 
       const recyclingPoint = await RecyclingPoint.create({
