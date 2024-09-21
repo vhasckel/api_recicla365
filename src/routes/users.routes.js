@@ -61,7 +61,7 @@ usersRoutes.delete(
     }
   */
 );
-usersRoutes.put(
+usersRoutes.patch(
   "/atualizar/:id",
   validateToken,
   UserController.updateAccount /*

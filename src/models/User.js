@@ -69,7 +69,9 @@ Permission.belongsToMany(User, {
 });
 
 User.beforeSave((user) => {
-  user.passwordHash = hashSync(user.passwordHash, 10);
+  if (user.changed("passwordHash")) {
+    user.passwordHash = hashSync(user.passwordHash, 10);
+  }
   return user;
 });
 

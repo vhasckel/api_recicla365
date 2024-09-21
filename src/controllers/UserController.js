@@ -1,9 +1,11 @@
 const {
   createUserRegisterSchema,
+  partialUpdateSchema,
 } = require("../middlewares/validationSchemas");
 const { RecyclingPoint } = require("../models");
 const User = require("../models/User");
 const handleError = require("../services/handleErros.service");
+const yup = require("yup");
 
 class UserController {
   async getAllUsers(request, response) {
@@ -124,15 +126,22 @@ class UserController {
   async updateAccount(request, response) {
     try {
       const { id } = request.params;
-      const validatedData = await createUserRegisterSchema.validate(
-        request.body,
-        { abortEarly: false }
-      );
+
+      const validatedData = await partialUpdateSchema.validate(request.body, {
+        abortEarly: false,
+      });
 
       const updatedAccount = await User.findByPk(id);
 
       if (!updatedAccount) {
         return response.status(404).json({ message: "Usuário não encontrado" });
+      }
+
+      // verifica se o CPF está sendo alterado
+      if (validatedData.cpf) {
+        return response.status(403).json({
+          message: "Alteração do CPF não é permitida",
+        });
       }
 
       if (updatedAccount.id !== request.userId) {
