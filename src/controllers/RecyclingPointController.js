@@ -21,21 +21,33 @@ class RecyclingPointController {
         request.body,
         { abortEarly: false }
       );
+  
+      const { userId, name, description, materials, cep, neighbourhood, street, number, complemento, state, city } = validatedData;
+  
+      let latitude = validatedData.latitude;
+      let longitude = validatedData.longitude;
+  
+      if (!latitude || !longitude) {
+        try {
+          const locationData = await getMapData(cep);
 
-      const { name, description, materials, cep } = validatedData;
-      const locationData = await getMapData(cep);
-      const googleMapsLink = await getGoogleMapsLink(locationData);
-      const { logradouro: street, bairro: neighbourhood } = await getCepData(
-        cep
-      );
-      const { lat: latitude, lon: longitude } = locationData;
-      const { userId } = request;
+          latitude = parseFloat(locationData.lat);
+          longitude = parseFloat(locationData.lon);
+        } catch (error) {
+          console.error("Erro ao buscar localização:", error.message);
+          return response.status(500).json({ message: "Erro ao buscar localização." });
+        }
+      }
+  
+      if (!latitude || !longitude) {
+        return response.status(400).json({ message: "Latitude e Longitude não podem ser vazias." });
+      }
+
+      const googleMapsLink = await getGoogleMapsLink({ lat: latitude, lon: longitude });
 
       // verificação se materials é um array
       if (!Array.isArray(materials)) {
-        return response
-          .status(400)
-          .json({ message: "Materials precisa ser um Array de IDs" });
+        return response.status(400).json({ message: "Materials precisa ser um Array de IDs" });
       }
 
       // verificação se o array não está vazio
@@ -56,9 +68,7 @@ class RecyclingPointController {
       });
 
       // extrai os IDs dos materiais encontrados
-      const existingMaterialIds = existingMaterials.map(
-        (material) => material.id
-      );
+      const existingMaterialIds = existingMaterials.map((material) => material.id);
 
       // verifica se todos os IDs enviados estão presentes na tabela materials
       const missingMaterials = materials.filter(
@@ -67,9 +77,7 @@ class RecyclingPointController {
 
       if (missingMaterials.length > 0) {
         return response.status(400).json({
-          message: `Os seguintes IDs de materials são inválidos: ${missingMaterials.join(
-            ", "
-          )}`,
+          message: `Os seguintes IDs de materials são inválidos: ${missingMaterials.join(", ")}`,
         });
       }
 
@@ -79,6 +87,10 @@ class RecyclingPointController {
         cep,
         neighbourhood,
         street,
+        number,
+        complemento,
+        state,
+        city,
         longitude,
         latitude,
         userId,
@@ -112,40 +124,94 @@ class RecyclingPointController {
 
   async getAllRecyclingPoints(request, response) {
     try {
-      const points = await RecyclingPoint.findAll({
-        attributes: ["id", "name"],
-      });
+        const points = await RecyclingPoint.findAll({
+            include: [
+                {
+                    model: Material,
+                    as: 'materials',
+                    attributes: ['id', 'name'],
+                    through: { attributes: [] }
+                }
+            ],
+            attributes: [
+                "id",
+                "name",
+                "latitude",
+                "longitude",
+                "description",
+                "street",
+                "number",
+                "complemento",
+                "neighbourhood",
+                "city",
+                "state",
+                "cep",
+                "googleMapsLink",
+            ],
+        });
 
-      if (points.length === 0) {
-        return response
-          .status(404)
-          .json({ message: "Não foi encontrado nenhum ponto de coleta" });
-      }
-      return response.status(200).json(points);
+        if (points.length === 0) {
+            return response.status(404).json({ message: "Não foi encontrado nenhum ponto de coleta" });
+        }
+
+        // Formatar os pontos de coleta para incluir os tipos de materiais
+        const formattedPoints = points.map(ponto => ({
+            ...ponto.toJSON(),
+            materials: ponto.materials.map(material => material.name)
+        }));
+
+        return response.status(200).json(formattedPoints);
     } catch (error) {
-      handleError(response, "Erro ao buscar pontos de coleta", error);
+        handleError(response, "Erro ao buscar pontos de coleta", error);
     }
-  }
+}
 
-  async getMyRecyclingPoints(request, response) {
-    try {
+async getMyRecyclingPoints(request, response) {
+  try {
       const { userId } = request;
 
       const recyclingPoints = await RecyclingPoint.findAll({
-        where: {
-          userId,
-        },
+          where: { userId },
+          include: [
+              {
+                  model: Material,
+                  as: 'materials',
+                  attributes: ['id', 'name'],
+                  through: { attributes: [] },
+              }
+          ],
+          attributes: [
+              "id",
+              "name",
+              "description",
+              "street",
+              "neighbourhood",
+              "city",
+              "state",
+              "number",
+              "complemento",
+              "cep",
+              "latitude",
+              "longitude",
+              "googleMapsLink",
+          ],
       });
 
-      return response.status(200).json(recyclingPoints);
-    } catch (error) {
-      handleError(
-        response,
-        "Erro ao buscar os pontos de coleta do usuário.",
-        error
-      );
-    }
+      if (recyclingPoints.length === 0) {
+          return response.status(404).json({ message: "Não foi encontrado nenhum ponto de coleta" });
+      }
+
+      const formattedPoints = recyclingPoints.map(ponto => ({
+          ...ponto.toJSON(),
+          materials: ponto.materials.map(material => material.name)
+      }));
+
+      return response.status(200).json(formattedPoints);
+  } catch (error) {
+      console.error(error);
+      handleError(response, "Erro ao buscar os pontos de coleta do usuário.", error);
   }
+}
 
   async getOneRecyclingPoint(request, response) {
     try {

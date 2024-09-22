@@ -7,15 +7,12 @@ const createCollectPointSchema = yup.object().shape({
     .string()
     .trim()
     .matches(/^\d{5}\d{3}$/),
-  neighbourhood: yup.string().trim().nullable(),
-  street: yup.string().trim().nullable(),
-  longitude: yup
-    .number()
-    .required("Longitude é obrigatório")
-    .min(-180)
-    .max(180),
-  latitude: yup.number().required("Latitude é obrigatório").min(-90).max(90),
+  neighbourhood: yup.string().trim().required("Bairro é obrigatório"),
+  street: yup.string().trim().required("Logradouro é obrigatório"),
+  city: yup.string().trim().required("Cidade é obrigatório"),
+  state: yup.string().trim().required("Estado é obrigatório"),
   userId: yup.number().required("User ID é obrigatório"),
+  complemento: yup.string().nullable(),
   materials: yup
     .array()
     .of(yup.number().positive().integer())

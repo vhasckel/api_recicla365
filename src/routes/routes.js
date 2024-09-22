@@ -15,7 +15,7 @@ routes.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 routes.use("/usuarios", usersRoutes);
 routes.use("/login", loginRoutes);
 
-routes.use("/pontosDeColeta", validateToken, recyclingRoutes);
+routes.use("/pontosDeColeta", recyclingRoutes);
 routes.use("/permissoes", validateToken, permissionsRoutes);
 
 module.exports = routes;
