@@ -22,11 +22,30 @@ const RecyclingPoint = connection.define("recycling_points", {
     type: DataTypes.STRING(100),
     allowNull: false,
   },
+  city: {
+    type: DataTypes.STRING(50),
+    allowNull: false,
+  },
+  state: {
+    type: DataTypes.STRING(2),
+    allowNull: false,
+  },
+  number: {
+    type: DataTypes.STRING(10),
+    allowNull: false,
+  },
+  complemento: {
+    type: DataTypes.STRING(50),
+    allowNull: true,
+  },
   latitude: {
     type: DataTypes.DECIMAL(9, 6),
     allowNull: false,
   },
-  googleMapsLink: { type: DataTypes.STRING, allowNull: true },
+  googleMapsLink: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
   longitude: {
     type: DataTypes.DECIMAL(9, 6),
     allowNull: false,

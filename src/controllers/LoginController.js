@@ -34,7 +34,7 @@ class LoginController {
       if (passwordValidate === false) {
         return response
           .status(404)
-          .json({ message: "E-mail ou senha incorretos." });
+          .json({ mensagem: "E-mail ou senha incorretos." });
       }
 
       const token = sign(

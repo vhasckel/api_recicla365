@@ -1,6 +1,6 @@
 const { Router } = require("express");
 const RecyclingPointController = require("../controllers/RecyclingPointController");
-
+const validateToken = require("../middlewares/validationToken");
 const recyclingRoutes = new Router();
 
 recyclingRoutes.post(
@@ -49,6 +49,7 @@ recyclingRoutes.get(
 );
 recyclingRoutes.get(
   "/local",
+  validateToken,
   RecyclingPointController.getMyRecyclingPoints
   /*
   #swagger.tags = ['Pontos de Coleta']
@@ -63,6 +64,7 @@ recyclingRoutes.get(
 );
 recyclingRoutes.get(
   "/detalhes/:id",
+  validateToken,
   RecyclingPointController.getOneRecyclingPoint
   /*
     #swagger.tags = ['Pontos de Coleta']
@@ -85,6 +87,7 @@ recyclingRoutes.get(
 );
 recyclingRoutes.put(
   "/local/:id",
+  validateToken,
   RecyclingPointController.updateRecyclingPoint
   /*
     #swagger.tags = ['Pontos de Coleta']
@@ -126,6 +129,7 @@ recyclingRoutes.put(
 );
 recyclingRoutes.delete(
   "/local/:id",
+  validateToken,
   RecyclingPointController.deleteRecyclingPoint
   /*
     #swagger.tags = ['Pontos de Coleta']

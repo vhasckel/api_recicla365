@@ -7,26 +7,68 @@ module.exports = {
       "materials",
       [
         {
-          name: "reciclavel",
-          description: "Descrição para reciclável",
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        },
-        {
-          name: "vidro",
+          name: "Vidro",
           description: "Descrição para vidro",
           createdAt: new Date(),
           updatedAt: new Date(),
         },
         {
-          name: "oleo",
+          name: "Madeira",
+          description: "Descrição para madeira",
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          name: "Papel",
+          description: "Descrição para papel e papelão",
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          name: "Alumínio",
+          description: "Descrição para alumínio",
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          name: "Óleo",
           description: "Descrição para óleo",
           createdAt: new Date(),
           updatedAt: new Date(),
         },
         {
-          name: "organico",
-          description: "Descrição para orgânico",
+          name: "Pilhas",
+          description: "Descrição para pilhas",
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          name: "Lâmpadas",
+          description: "Descrição para lâmpadas",
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          name: "Eletrônicos",
+          description: "Descrição para eletrônicos",
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          name: "Lixo hospitalar",
+          description: "Descrição para lixo hospitalar",
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          name: "Material não reciclável",
+          description: "Descrição para material não reciclável",
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          name: "Material de construção",
+          description: "Descrição para material de construção",
           createdAt: new Date(),
           updatedAt: new Date(),
         },
@@ -37,7 +79,19 @@ module.exports = {
 
   async down(queryInterface, Sequelize) {
     await queryInterface.bulkDelete("materials", {
-      name: ["reciclavel", "vidro", "oleo", "organico"],
+      name: [
+        "Vidro",
+        "Madeira",
+        "Papel",
+        "Alumínio",
+        "Óleo",
+        "Pilhas",
+        "Lâmpadas",
+        "Eletrônicos",
+        "Lixo hospitalar",
+        "Material não reciclável",
+        "Material de construção"
+      ],
     });
   },
 };
