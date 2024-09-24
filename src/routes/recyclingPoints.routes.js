@@ -154,27 +154,4 @@ recyclingRoutes.delete(
   */
 );
 
-recyclingRoutes.get(
-  "/local/:id/maps",
-  RecyclingPointController.getLinkMap
-  /*
-    #swagger.tags = ['Pontos de Coleta']
-    #swagger.description = 'Endpoint para buscar o link do Google Maps através do ID de um ponto de coleta'
-    #swagger.parameters['id'] = {
-        in: 'path',
-        description: 'ID do ponto de coleta',
-        required: true,
-        schema: {
-            type: 'integer'
-        }
-    }
-    #swagger.responses[200] = {
-        description: 'Link do Google Maps para o ponto de coleta'
-    }
-    #swagger.responses[404] = {
-        description: 'Ponto de coleta não encontrado'
-    }
-  */
-);
-
 module.exports = recyclingRoutes;
