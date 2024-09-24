@@ -213,112 +213,150 @@ async getMyRecyclingPoints(request, response) {
   }
 }
 
-  async getOneRecyclingPoint(request, response) {
-    try {
+async getOneRecyclingPoint(request, response) {
+  try {
       const { id } = request.params;
       //se quiser que apareça os materiais junto com essa requisição, é preciso incluir o model de Material
       const point = await RecyclingPoint.findByPk(id, {
-        include: [
-          {
-            model: Material,
-            through: {
-              attributes: [],
-            },
-          },
-        ],
+          include: [
+              {
+                  model: Material,
+                  as: 'materials',
+                  attributes: ['id', 'name'],
+                  through: {
+                      attributes: [],
+                  },
+              },
+          ],
+          attributes: [
+              "id",
+              "name",
+              "description",
+              "street",
+              "neighbourhood",
+              "city",
+              "state",
+              "number",
+              "complemento",
+              "cep",
+              "latitude",
+              "longitude",
+              "googleMapsLink",
+          ],
       });
 
       if (!point) {
-        return response
-          .status(404)
-          .json({ message: "Ponto de coleta não encontrado" });
+          return response
+              .status(404)
+              .json({ message: "Ponto de coleta não encontrado" });
       }
 
-      return response.status(200).json(point);
-    } catch (error) {
+      const formattedPoint = {
+        ...point.toJSON(),
+        materials: point.materials.map(material => ({
+            value: material.id,
+            label: material.name
+        }))
+    };
+
+      return response.status(200).json(formattedPoint);
+  } catch (error) {
+      console.error(error);
       handleError(response, "Erro ao buscar ponto de coleta", error);
-    }
   }
+}
 
-  async getLinkMap(request, response) {
-    try {
-      const { id } = request.params;
-
-      const point = await RecyclingPoint.findByPk(id, {
-        attributes: ["id", "name", "googleMapsLink"],
-      });
-
-      if (!point) {
-        return response
-          .status(404)
-          .json({ message: "Ponto de coleta não encontrado" });
-      }
-
-      return response
-        .status(200)
-        .json({ googleMapsLink: point.googleMapsLink });
-    } catch (error) {
-      handleError(response, "Erro ao buscar link do Google Maps", error);
-    }
-  }
-
-  async updateRecyclingPoint(request, response) {
-    try {
+async updateRecyclingPoint(request, response) {
+  try {
       const { id } = request.params;
       const validatedData = await createCollectPointSchema.validate(
-        request.body,
-        { abortEarly: false }
+          request.body,
+          { abortEarly: false }
       );
 
       const point = await RecyclingPoint.findByPk(id);
 
       if (!point) {
-        return response
-          .status(404)
-          .json({ message: "Ponto de coleta não encontrado" });
+          return response
+              .status(404)
+              .json({ message: "Ponto de coleta não encontrado" });
       }
 
       if (point.userId !== request.userId) {
-        return response.status(403).json({
-          message: "Você não tem permissão para atualizar este ponto de coleta",
-        });
+          return response.status(403).json({
+              message: "Você não tem permissão para atualizar este ponto de coleta",
+          });
       }
 
-      Object.assign(point, validatedData);
+      const { userId, name, description, materials, cep, neighbourhood, street, number, complemento, state, city } = validatedData;
+
+      let latitude = validatedData.latitude;
+      let longitude = validatedData.longitude;
+
+      if (!latitude || !longitude) {
+          try {
+              const locationData = await getMapData(cep);
+              latitude = parseFloat(locationData.lat);
+              longitude = parseFloat(locationData.lon);
+          } catch (error) {
+              console.error("Erro ao buscar localização:", error.message);
+              return response.status(500).json({ message: "Erro ao buscar localização." });
+          }
+      }
+
+      const googleMapsLink = await getGoogleMapsLink({ lat: latitude, lon: longitude });
+
+      // atualiza o ponto de coleta com os dados validados
+      Object.assign(point, {
+          userId,
+          name,
+          description,
+          cep,
+          neighbourhood,
+          street,
+          number,
+          complemento,
+          state,
+          city,
+          latitude,
+          longitude,
+          googleMapsLink
+      });
+
       await point.save();
 
       //para poder atualizar os tipos de materiais, precisamos primeiro limpar os dados que estavam salvos
       if (Array.isArray(validatedData.materials)) {
-        await MaterialCollectionPoint.destroy({
-          where: { collectPointId: id },
-        });
+          await MaterialCollectionPoint.destroy({
+              where: { collectPointId: id },
+          });
 
-        const materialAssociations = validatedData.materials.map(
-          (materialId) => ({
-            collectPointId: id,
-            materialId,
-          })
-        );
-        //e novamente fazer essa inserão de dados com o bulkCreate
-        await MaterialCollectionPoint.bulkCreate(materialAssociations);
+          const materialAssociations = validatedData.materials.map(
+              (materialId) => ({
+                  collectPointId: id,
+                  materialId,
+              })
+          );
+          //e novamente fazer essa inserão de dados com o bulkCreate
+          await MaterialCollectionPoint.bulkCreate(materialAssociations);
       }
 
       const updatedPoint = await RecyclingPoint.findByPk(id, {
-        include: [
-          {
-            model: Material,
-            through: {
-              attributes: [],
-            },
-          },
-        ],
+          include: [
+              {
+                  model: Material,
+                  through: {
+                      attributes: [],
+                  },
+              },
+          ],
       });
 
       return response.status(200).json(updatedPoint);
-    } catch (error) {
-      handleError(response, "Erro ao atulizar ponto de coleta", error);
-    }
+  } catch (error) {
+      handleError(response, "Erro ao atualizar ponto de coleta", error);
   }
+}
 
   async deleteRecyclingPoint(request, response) {
     try {
