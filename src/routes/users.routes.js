@@ -1,6 +1,7 @@
 const { Router } = require("express");
 const UserController = require("../controllers/UserController");
 const validateToken = require("../middlewares/validationToken");
+const verifyPermission = require("../middlewares/verifyPermission");
 
 const usersRoutes = new Router();
 
@@ -105,6 +106,7 @@ usersRoutes.patch(
 usersRoutes.get(
   "/",
   validateToken,
+  verifyPermission(["adm"]),
   UserController.getAllUsers /*
     #swagger.tags = ['Usuários']
     #swagger.description = 'Endpoint para obter todos os usuários'
