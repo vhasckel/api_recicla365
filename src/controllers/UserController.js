@@ -44,7 +44,15 @@ class UserController {
         birthdate,
         email,
         passwordHash,
+        permission = "user",
       } = validatedData;
+
+      // verifica se o usuário tem permissão para criar um administrador
+      if (permission === "adm" && request.userPermission !== "adm") {
+        return response.status(403).json({
+          message: "Você não tem permissão para criar um administrador.",
+        });
+      }
 
       const [emailVerify, cpfVerify] = await Promise.all([
         User.findOne({ where: { email } }),
@@ -76,12 +84,14 @@ class UserController {
         birthdate,
         email,
         passwordHash,
+        permission,
       });
 
       response.status(201).json({
         id: user.id,
         name: user.name,
         email: user.email,
+        permission: permission,
         createdAt: user.createdAt,
       });
     } catch (error) {
