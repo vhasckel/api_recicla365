@@ -55,11 +55,6 @@ const User = connection.define("users", {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  permission: {
-    type: DataTypes.STRING,
-    allowNull: false,
-    defaultValue: "user",
-  },
 });
 
 User.belongsToMany(Permission, {

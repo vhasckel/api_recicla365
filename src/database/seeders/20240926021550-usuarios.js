@@ -1,13 +1,14 @@
 "use strict";
 
 const bcrypt = require("bcryptjs");
+const Permission = require("../../models/Permission");
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
     const hashedPassword = await bcrypt.hash("senha123", 10);
 
-    await queryInterface.bulkInsert(
+    const users = await queryInterface.bulkInsert(
       "users",
       [
         {
@@ -91,11 +92,33 @@ module.exports = {
           updatedAt: new Date(),
         },
       ],
-      {}
+      { returning: true }
     );
+
+    // obter o ID da permissão "user"
+    const userPermission = await Permission.findOne({
+      where: { description: "user" },
+    });
+
+    if (userPermission) {
+      // associar todos os usuários à permissão "user"
+      for (const user of users) {
+        await queryInterface.bulkInsert("user_permissions", [
+          {
+            userId: user.id,
+            permissionId: userPermission.id,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          },
+        ]);
+      }
+    } else {
+      console.error("Permissão 'user' não encontrada.");
+    }
   },
 
   async down(queryInterface, Sequelize) {
+    await queryInterface.bulkDelete("user_permissions", null, {});
     await queryInterface.bulkDelete("users", null, {});
   },
 };

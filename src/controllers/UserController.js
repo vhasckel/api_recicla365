@@ -3,9 +3,9 @@ const {
   partialUpdateSchema,
 } = require("../middlewares/validationSchemas");
 const { RecyclingPoint } = require("../models");
+const Permission = require("../models/Permission");
 const User = require("../models/User");
 const handleError = require("../services/handleErros.service");
-const yup = require("yup");
 
 class UserController {
   async getAllUsers(request, response) {
@@ -44,11 +44,13 @@ class UserController {
         birthdate,
         email,
         passwordHash,
-        permission = "user",
       } = validatedData;
 
       // verifica se o usuário tem permissão para criar um administrador
-      if (permission === "adm" && request.userPermission !== "adm") {
+      if (
+        request.userPermission !== "adm" &&
+        validatedData.permission === "adm"
+      ) {
         return response.status(403).json({
           message: "Você não tem permissão para criar um administrador.",
         });
@@ -84,14 +86,32 @@ class UserController {
         birthdate,
         email,
         passwordHash,
-        permission,
       });
+
+      // obtém a permissão padrão "user"
+      const userPermission = await Permission.findOne({
+        where: { description: "user" },
+      });
+
+      // verifica se a permissão foi encontrada
+      if (userPermission) {
+        console.log("Permissão encontrada:", userPermission);
+        try {
+          // associa a permissão ao usuário
+          await user.addPermission(userPermission.id);
+          console.log("Associação realizada com sucesso.");
+        } catch (err) {
+          console.error("Erro ao associar permissão:", err);
+        }
+      } else {
+        console.error("Permissão 'user' não encontrada.");
+      }
 
       response.status(201).json({
         id: user.id,
         name: user.name,
         email: user.email,
-        permission: permission,
+        permission: "user",
         createdAt: user.createdAt,
       });
     } catch (error) {
