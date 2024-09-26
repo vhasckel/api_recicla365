@@ -1,3 +1,4 @@
+const Permission = require("../models/Permission");
 const User = require("../models/User");
 
 const verifyPermission = (permissoesRequeridas) => {
@@ -6,24 +7,32 @@ const verifyPermission = (permissoesRequeridas) => {
       const { userId } = request;
       console.log(`Verifying permissions for User ID: ${userId}`);
 
-      const user = await User.findByPk(userId);
+      const user = await User.findByPk(userId, {
+        include: {
+          model: Permission,
+          as: "permissions",
+          attributes: ["description"],
+        },
+      });
 
       if (!user) {
-        console.log(`User with ID ${userId} not found`);
+        console.log(`Usuário com ID ${userId} não encontrado`);
         return response
           .status(404)
           .json({ mensagem: "Usuário não encontrado" });
       }
 
-      // Acesso direto ao campo permission do usuário
-      const userPermission = user.permission; // Assume que o campo permission é uma string
-      console.log(`User permission: ${userPermission}`);
+      // obtém as permissões do usuário
+      const userPermissions = user.permissions.map((perm) => perm.description);
+      console.log(`Permissões do usuário: ${userPermissions}`);
 
-      // Verifica se o usuário possui a permissão necessária
-      const isAllowed = permissoesRequeridas.includes(userPermission);
-      console.log(`Is allowed: ${isAllowed}`);
-      console.log(`Required Permissions: ${permissoesRequeridas}`);
-      console.log(`User ID: ${userId}`);
+      // verifica se o usuário possui alguma das permissões necessárias
+      const isAllowed = permissoesRequeridas.some((perm) =>
+        userPermissions.includes(perm)
+      );
+
+      console.log(`Permissões necessárias: ${permissoesRequeridas}`);
+      console.log(`Permissão concedida: ${isAllowed}`);
 
       if (!isAllowed) {
         return response
