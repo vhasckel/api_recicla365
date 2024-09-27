@@ -109,7 +109,6 @@ usersRoutes.patch(
 usersRoutes.get(
   "/",
   validateToken,
-  verifyPermission(["adm"]),
   UserController.getAllUsers /*
     #swagger.tags = ['Usuários']
     #swagger.description = 'Endpoint para obter todos os usuários'
