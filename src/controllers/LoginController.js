@@ -2,6 +2,7 @@ const { compareSync } = require("bcryptjs");
 const User = require("../models/User");
 const { sign } = require("jsonwebtoken");
 const handleError = require("../services/handleErros.service");
+const Permission = require("../models/Permission");
 
 class LoginController {
   async login(request, response) {
@@ -17,6 +18,11 @@ class LoginController {
       const user = await User.findOne({
         where: {
           email: data.email,
+        },
+        include: {
+          model: Permission,
+          as: "permissions",
+          attributes: ["description"],
         },
       });
 
@@ -37,9 +43,14 @@ class LoginController {
           .json({ mensagem: "E-mail ou senha incorretos." });
       }
 
+      const permissions = user.permissions.map((perm) => perm.description);
+
+      request.userPermission = permissions[0];
+
       const token = sign(
         {
           id: user.id,
+          permissions: permissions,
         },
         process.env.JWT_SECRET,
         { expiresIn: "1d" }
@@ -47,7 +58,6 @@ class LoginController {
 
       return response.json({
         token: token,
-        name: user.name,
       });
     } catch (error) {
       handleError(response, "Não foi possível realizar login", error);
