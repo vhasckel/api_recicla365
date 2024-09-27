@@ -4,7 +4,7 @@ const validateToken = require("../middlewares/validationToken");
 const recyclingRoutes = new Router();
 
 recyclingRoutes.post(
-  "/cadastrar",
+  "/create",
   RecyclingPointController.createCollectPoint
   /*
     #swagger.tags = ['Pontos de Coleta']
@@ -63,7 +63,7 @@ recyclingRoutes.get(
 */
 );
 recyclingRoutes.get(
-  "/detalhes/:id",
+  "/details/:id",
   validateToken,
   RecyclingPointController.getOneRecyclingPoint
   /*

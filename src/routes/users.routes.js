@@ -6,7 +6,7 @@ const verifyPermission = require("../middlewares/verifyPermission");
 const usersRoutes = new Router();
 
 usersRoutes.post(
-  "/cadastrar",
+  "/create",
   UserController.createAccount /*
     #swagger.tags = ['Usuários']
     #swagger.description = 'Endpoint para criar uma nova conta de usuário'
@@ -38,7 +38,7 @@ usersRoutes.post(
   */
 );
 usersRoutes.delete(
-  "/deletar/:id",
+  "/delete/:id",
   validateToken,
   UserController.deleteAccount /*
     #swagger.tags = ['Usuários']
@@ -63,7 +63,7 @@ usersRoutes.delete(
   */
 );
 usersRoutes.patch(
-  "/atualizar/:id",
+  "/update/:id",
   validateToken,
   UserController.updateAccount /*
     #swagger.tags = ['Usuários']
@@ -81,10 +81,13 @@ usersRoutes.patch(
         description: 'Dados atualizados do usuário',
         required: true,
         schema: {
-            $name: "Nome Atualizado",
+            $name: "Nome Completo",
+            $birthdate: "1995-05-05",
             $gender: "feminino",
             $cpf: "99999999999",
             $cep: "88036280",
+            $city: "Cidade A",
+            $state: "SC",
             $neighbourhood: "trindade",
             $street: "prof. enoe schutel",
             $number: 286,

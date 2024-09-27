@@ -74,7 +74,7 @@ permissionsRoutes.delete(
 );
 
 permissionsRoutes.post(
-  "/atribuir",
+  "/assign",
   validateToken,
   PermissionController.assignPermission
   /*
