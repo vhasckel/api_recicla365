@@ -9,13 +9,19 @@ const swaggerUi = require("swagger-ui-express");
 const swaggerDocument = require("./doc.swagger.json");
 const loginRoutes = require("./login.routes");
 const permissionsRoutes = require("./permissions.routes");
+const verifyPermission = require("../middlewares/verifyPermission");
 
 routes.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
-routes.use("/usuarios", usersRoutes);
+routes.use("/users", usersRoutes);
 routes.use("/login", loginRoutes);
 
-routes.use("/pontosDeColeta", recyclingRoutes);
-routes.use("/permissoes", validateToken, permissionsRoutes);
+routes.use("/collection-points", recyclingRoutes);
+routes.use(
+  "/permissions",
+  validateToken,
+  verifyPermission(["adm"]),
+  permissionsRoutes
+);
 
 module.exports = routes;

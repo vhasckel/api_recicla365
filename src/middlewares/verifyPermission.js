@@ -10,30 +10,34 @@ const verifyPermission = (permissoesRequeridas) => {
       const user = await User.findByPk(userId, {
         include: {
           model: Permission,
-          through: {
-            attributes: [],
-          },
+          as: "permissions",
+          attributes: ["description"],
         },
       });
 
       if (!user) {
-        console.log(`User with ID ${userId} not found`);
+        console.log(`Usuário com ID ${userId} não encontrado`);
         return response
           .status(404)
           .json({ mensagem: "Usuário não encontrado" });
       }
 
-      const userPermissions = user.permissions.map((p) => p.description);
-      console.log(`User permissions: ${userPermissions}`);
+      // obtém as permissões do usuário
+      const userPermissions = user.permissions.map((perm) => perm.description);
+      console.log(`Permissões do usuário: ${userPermissions}`);
 
-      const isAllowed = permissoesRequeridas.every((permission) =>
-        userPermissions.includes(permission)
+      // verifica se o usuário possui alguma das permissões necessárias
+      const isAllowed = permissoesRequeridas.some((perm) =>
+        userPermissions.includes(perm)
       );
+
+      console.log(`Permissões necessárias: ${permissoesRequeridas}`);
+      console.log(`Permissão concedida: ${isAllowed}`);
 
       if (!isAllowed) {
         return response
           .status(401)
-          .json({ mensagem: "Usuário não tem uma ou mais permissões" });
+          .json({ mensagem: "Usuário não tem permissão necessária" });
       }
 
       next();

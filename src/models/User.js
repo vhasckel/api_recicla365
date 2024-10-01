@@ -61,6 +61,7 @@ User.belongsToMany(Permission, {
   through: UserPermission,
   foreignKey: "userId",
   otherKey: "permissionId",
+  as: "permissions",
 });
 Permission.belongsToMany(User, {
   through: UserPermission,
