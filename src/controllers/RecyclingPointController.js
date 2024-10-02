@@ -288,7 +288,9 @@ async updateRecyclingPoint(request, response) {
 
       const permission = await Permission.findByPk(permissionId.dataValues.permissionId);
 
-      if (point.userId !== request.userId && permission.dataValues.description !== 'admin') {
+      console.log(permission.dataValues.description);
+
+      if (point.userId !== request.userId && permission.dataValues.description !== 'adm') {
           return response.status(403).json({
               message: "Você não tem permissão para atualizar este ponto de coleta",
           });
@@ -379,7 +381,7 @@ async updateRecyclingPoint(request, response) {
 
       const permission = await Permission.findByPk(permissionId.dataValues.permissionId);
 
-      if (point.userId !== request.userId && permission.dataValues.description !== 'admin') {
+      if (point.userId !== request.userId && permission.dataValues.description !== 'adm') {
         return response.status(403).json({
           message: "Você não tem permissão para deletar este ponto de coleta",
         });
