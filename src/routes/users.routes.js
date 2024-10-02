@@ -121,5 +121,27 @@ usersRoutes.get(
     }
   */
 );
+usersRoutes.get(
+  "/:id",
+  validateToken, // Se apenas administradores puderem acessar esse recurso
+  UserController.getUserById /*
+      #swagger.tags = ['Usuários']
+      #swagger.description = 'Endpoint para buscar um usuário pelo ID'
+      #swagger.parameters['id'] = {
+        in: 'path',
+        description: 'ID do usuário',
+        required: true,
+        schema: {
+          type: 'integer'
+        }
+      }
+      #swagger.responses[200] = {
+        description: 'Usuário encontrado com sucesso'
+      }
+      #swagger.responses[404] = {
+        description: 'Usuário não encontrado'
+      }
+    */
+);
 
 module.exports = usersRoutes;
