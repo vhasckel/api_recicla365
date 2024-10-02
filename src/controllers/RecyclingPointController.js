@@ -3,6 +3,7 @@ const {
   Material,
   MaterialCollectionPoint,
 } = require("../models");
+const UserPermission = require("../models/UserPermission");
 const {
   createCollectPointSchema,
 } = require("../middlewares/validationSchemas");
@@ -13,6 +14,7 @@ const {
 } = require("../services/associateMaterials.service");
 const handleError = require("../services/handleErros.service");
 const { Op } = require("sequelize");
+const Permission = require("../models/Permission");
 
 class RecyclingPointController {
   async createCollectPoint(request, response) {
@@ -282,7 +284,11 @@ async updateRecyclingPoint(request, response) {
               .json({ message: "Ponto de coleta não encontrado" });
       }
 
-      if (point.userId !== request.userId) {
+      const permissionId = await UserPermission.findByPk(request.userId);
+
+      const permission = await Permission.findByPk(permissionId.dataValues.permissionId);
+
+      if (point.userId !== request.userId && permission.dataValues.description !== 'admin') {
           return response.status(403).json({
               message: "Você não tem permissão para atualizar este ponto de coleta",
           });
@@ -369,7 +375,11 @@ async updateRecyclingPoint(request, response) {
           .json({ message: "Ponto de coleta não encontrado" });
       }
 
-      if (point.userId !== request.userId) {
+      const permissionId = await UserPermission.findByPk(request.userId);
+
+      const permission = await Permission.findByPk(permissionId.dataValues.permissionId);
+
+      if (point.userId !== request.userId && permission.dataValues.description !== 'admin') {
         return response.status(403).json({
           message: "Você não tem permissão para deletar este ponto de coleta",
         });
