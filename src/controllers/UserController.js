@@ -5,6 +5,7 @@ const {
 const { RecyclingPoint } = require("../models");
 const Permission = require("../models/Permission");
 const User = require("../models/User");
+const UserPermission = require("../models/UserPermission");
 const handleError = require("../services/handleErros.service");
 
 class UserController {
@@ -24,6 +25,26 @@ class UserController {
       handleError(response, "Erro ao buscar usuários", error);
     }
   }
+
+  async getUserById(request, response) {
+    try {
+      const { id } = request.params; // Obtém o ID da requisição
+
+      // Busca o usuário pelo ID
+      const user = await User.findByPk(id, {
+        attributes: ["id", "name", "email", "cpf", "birthdate"],
+      });
+
+      if (!user) {
+        return response.status(404).json({ message: "Usuário não encontrado" });
+      }
+
+      return response.status(200).json(user); // Retorna o usuário encontrado
+    } catch (error) {
+      handleError(response, "Erro ao buscar usuário", error);
+    }
+  }
+
   async createAccount(request, response) {
     try {
       const validatedData = await createUserRegisterSchema.validate(
@@ -145,6 +166,7 @@ class UserController {
             "Não é possível deletar a conta. Existem pontos de coleta vinculados a este usuário.",
         });
       }
+      await UserPermission.destroy({ where: { userId: id } });
       await account.destroy();
 
       return response.status(204).send();
@@ -156,6 +178,8 @@ class UserController {
   async updateAccount(request, response) {
     try {
       const { id } = request.params;
+      console.log("ID do usuário:", id);
+      console.log("Dados da requisição:", request.body);
 
       const validatedData = await partialUpdateSchema.validate(request.body, {
         abortEarly: false,
@@ -180,11 +204,30 @@ class UserController {
         });
       }
 
-      Object.assign(updatedAccount, validatedData);
+      const allowedFields = [
+        "name",
+        "gender",
+        "birthdate",
+        "email",
+        "cep",
+        "street",
+        "number",
+        "neighbourhood",
+        "city",
+        "state",
+      ];
+      const updateData = Object.fromEntries(
+        Object.entries(validatedData).filter(([key]) =>
+          allowedFields.includes(key)
+        )
+      );
+
+      Object.assign(updatedAccount, updateData);
       await updatedAccount.save();
 
       return response.status(200).json(updatedAccount);
     } catch (error) {
+      console.error("Erro durante a atualização:", error);
       handleError(response, "Erro ao atualizar conta", error);
     }
   }
