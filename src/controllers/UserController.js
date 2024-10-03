@@ -32,7 +32,20 @@ class UserController {
 
       // Busca o usuário pelo ID
       const user = await User.findByPk(id, {
-        attributes: ["id", "name", "email", "cpf", "birthdate"],
+        attributes: [
+          "id",
+          "name",
+          "email",
+          "cpf",
+          "birthdate",
+          "gender",
+          "cep",
+          "street",
+          "number",
+          "neighbourhood",
+          "city",
+          "state",
+        ],
       });
 
       if (!user) {
